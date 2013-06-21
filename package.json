@@ -1,0 +1,15 @@
+{
+  "name": "piduino",
+  "version": "0.0.1",
+  "contributors": [
+    {
+      "name": "Jonathan Beri",
+      "email": "jmberi@gmail.com"
+    }
+  ],
+  "dependencies": {
+    "express": "3.2.x",
+    "socket.io": "0.9.x",
+    "johnny-five": "https://github.com/beriberikix/johnny-five/tarball/master"
+  }
+}

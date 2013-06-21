@@ -1,0 +1,129 @@
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+
+  <style>
+    body {
+      overflow : hidden;
+      padding : 0;
+      margin : 0;
+      background-color : #BBB;
+    }
+    #container {
+      width : 100%;
+      height : 100%;
+      overflow : hidden;
+      padding : 0;
+      margin : 0;
+      -webkit-user-select : none;
+      -moz-user-select : none;
+    }
+  </style>
+
+  <title>PiDuino</title>
+</head>
+<body>
+
+<div id="container">
+<!--  <span id="label">Not Ready</span> -->
+  <button id="forward" disabled="disabled">Forward</button>
+  <button id="reverse" disabled="disabled">Reverse</button>
+</div>
+
+<script src="/socket.io/socket.io.js"></script>
+<script src="/js/virtualjoystick.js/virtualjoystick.js"></script>
+<script>
+  var socket = io.connect('http://192.168.0.195:1337');
+
+  socket.on('connect', function() {
+    //document.querySelector('#label').innerHTML = 'ready';
+    var forwardBtn = document.querySelector('#forward');
+    var reverseBtn = document.querySelector('#reverse');
+
+    forwardBtn.addEventListener('click', forward);
+    reverseBtn.addEventListener('click', reverse);
+
+    forwardBtn.removeAttribute('disabled');
+    reverseBtn.removeAttribute('disabled');
+  });
+
+  function forward() {
+    socket.emit('forward', { data : 'nothing' } );
+  }
+
+  function reverse() {
+    socket.emit('reverse', { data : 'nothing' } );
+  }
+
+  // turn right
+  function gee() {
+    socket.emit('gee', { data : 'nothing' } );
+  }
+
+  // turn left
+  function haw() {
+    socket.emit('haw', { data : 'nothing' } );
+  }
+
+  function halt() {
+    socket.emit('halt', { data : 'nothing' } );
+  }
+
+  var joystick	= new VirtualJoystick({
+    container : document.getElementById('container'),
+    mouseSupport : true
+  });
+
+  /*
+  setInterval(function(){
+    if( joystick.up() ) {
+      forward();
+    }
+
+    if( joystick.down() ) {
+      reverse();
+    }
+
+    if( joystick.right() ) {
+      gee();
+    } 
+
+    if( joystick.left() ) {
+      haw();
+    }
+
+    if( joystick.deltaX() === 0 & joystick.deltaY() === 0 ) {
+      halt();
+    }
+  }, 1/30 * 1000);
+*/
+  function step(timestamp) {
+    if( joystick.up() ) {
+      forward();
+    }
+
+    if( joystick.down() ) {
+      reverse();
+    }
+
+    if( joystick.right() ) {
+      gee();
+    } 
+
+    if( joystick.left() ) {
+      haw();
+    }
+
+    if( joystick.deltaX() === 0 & joystick.deltaY() === 0 ) {
+      halt();
+    }
+
+    webkitRequestAnimationFrame(step);
+  }
+
+  webkitRequestAnimationFrame(step);
+</script>
+</body>
+</html>
+
