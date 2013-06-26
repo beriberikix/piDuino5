@@ -26,7 +26,6 @@
 <body>
 
 <div id="container">
-<!--  <span id="label">Not Ready</span> -->
   <button id="forward" disabled="disabled">Forward</button>
   <button id="reverse" disabled="disabled">Reverse</button>
 </div>
@@ -75,29 +74,6 @@
     mouseSupport : true
   });
 
-  /*
-  setInterval(function(){
-    if( joystick.up() ) {
-      forward();
-    }
-
-    if( joystick.down() ) {
-      reverse();
-    }
-
-    if( joystick.right() ) {
-      gee();
-    } 
-
-    if( joystick.left() ) {
-      haw();
-    }
-
-    if( joystick.deltaX() === 0 & joystick.deltaY() === 0 ) {
-      halt();
-    }
-  }, 1/30 * 1000);
-*/
   function step(timestamp) {
     if( joystick.up() ) {
       forward();
