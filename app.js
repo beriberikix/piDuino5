@@ -1,83 +1,108 @@
 var five = require("johnny-five"),
     express = require('express'),
     app = express(),
-    io = require('socket.io'),
+    board = new five.Board(),
     server = require('http').createServer(app),
-    io = io.listen(server),
     path = require('path'),
     localtunnel = require('localtunnel'),
     request = require('request'),
-    os = require('os'),
+    WebSocketServer = require('ws').Server,
+    LOCAL_IP = require('os').networkInterfaces().wlan0[0].address,
+    PORT = 8080,
     hbridge,
     board,
     client;
 
-board = new five.Board({ port: "/dev/ttyAMA0" });
+var wss = new WebSocketServer({server: server});
+app.set('port', process.env.PORT || PORT); 
+app.set('views', path.join(__dirname, 'views')); 
+app.use(express.favicon()); 
+app.use(express.logger('dev')); 
+app.use(express.json()); 
+app.use(express.urlencoded()); 
+app.use(express.methodOverride()); 
+app.use(app.router); 
+app.use(express.static(path.join(__dirname, 'public')));
+app.engine('html', require('ejs').renderFile);
 
-app.configure(function(){
-  app.use(express.static('public'));
-});
+// board setup
+board.on('ready', function() {
+  var motors, speed;
 
-app.get('/', function (req, res) {
-  res.sendfile(__dirname + '/index.html');
-});
+  speed = 100;
+  motors = {
+    left: new five.Motor([ 3, 12 ]),
+    right: new five.Motor([ 11, 13 ])
+  };
 
-io.sockets.on('connection', function (socket) {
-  socket.emit('onBoardReady', { ready : true });
-  socket.on('forward', function(data) {
-    hbridge.forward();
-  });
-  socket.on('reverse', function(data) {
-    hbridge.reverse();
-  });
-  socket.on('gee', function(data) {
-    hbridge.gee();
-  });
-  socket.on('haw', function(data) {
-    hbridge.haw();
-  });
-  socket.on('halt', function(data) {
-    hbridge.halt();
-  });
- });
-
-board.on("ready", function() {
-  // Create a new `hbridge` hardware instance.
-  hbridge = new five.HBridge({
-    "right": {
-      "forward": 7,
-      "reverse": 12
-    },
-    "left": {
-      "forward": 8,
-      "reverse": 13
-    }
-  });
-
-  // Inject the `hbridge` hardware into
-  // the Repl instance's context;
   board.repl.inject({
-    hbridge: hbridge
+    motors: motors
   });
+});
 
+app.get('/', function(req, res) {
+  res.render('index.html', { local_ip: LOCAL_IP, port: PORT });
+});
+
+server.listen(PORT);
+
+// ws setup
+wss.on('connection', function(ws) {
+    ws.on('message', function(data, flags) {
+	console.log(data);
+        if(data === 'forward') {
+           forward(255);
+        } else if(data === 'reverse') {
+            reverse(255);
+        } else if(data === 'turnRight') {
+            turnRight(255);
+        } else if(data === 'turnLeft') {
+            turnLeft(255);
+        } else if(data === 'halt') {
+            halt(255);
+        }
+    });
+});
+
+// motor functions
+var stop = function() {
+    motors.left.stop();
+    motors.right.stop();
+};
+
+var forward = function(speed) {
+    motors.left.fwd(speed);
+    motors.right.fwd(speed);
+};
+
+var reverse = function(speed) {
+    motors.left.rev(speed);
+    motors.right.rev(speed);    
+};
+
+var turnRight = function(speed) {
+    motors.left.fwd(speed);
+    motors.right.rev(speed);
+};
+
+var turnLeft = function(speed) {
+    motors.left.rev(speed);
+    motors.right.fwd(speed);
+};
+
+
+// dial-home device/localtunnel setup
 client = localtunnel.connect({
-    // the localtunnel server
     host: 'http://localtunnel.me',
-    // your local application port
-    port: 1337
+    port: PORT
 });
 
-  // starting web server
-  server.listen(1337);
-
-// when your are assigned a url
 client.on('url', function(url) {
-  var device = 'mark1',
-      local_ip = os.networkInterfaces().wlan0[0].address,
-      localtunnel = url;
+  var device = 'mark1';
 
-  var dhd_url = 'http://dhd-basic.appspot.com/?device=' + device + '&local_ip=' + local_ip + '&localtunnel=' + localtunnel;
-
+  var dhd_url = 'http://dhd-basic.appspot.com/?device=' + device;
+      dhd_url += '&local_ip=' + LOCAL_IP;
+      dhd_url += '&localtunnel=' + url;
+  
   request.post(dhd_url);
-});
 });
