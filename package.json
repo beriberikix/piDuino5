@@ -27,6 +27,6 @@
     "ws": "~0.4.32",
     "localtunnel": "~1.4.0",
     "johnny-five": "~0.8.14",
-    "request": "~2.45.0",
+    "request": "~2.45.0"
   }
 }
