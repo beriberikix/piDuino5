@@ -8,7 +8,13 @@
     "email": "jmberi@gmail.com"
   },
   "keywords": [
-    "arduino", "raspberrypi", "firmata", "robot", "raspberry pi", "rpi", "johnny-five"
+    "arduino",
+    "raspberrypi",
+    "firmata",
+    "robot",
+    "raspberry pi",
+    "rpi",
+    "johnny-five"
   ],
   "repository": {
     "type": "git",
@@ -28,6 +34,7 @@
     "localtunnel": "~1.4.0",
     "johnny-five": "~0.8.14",
     "request": "~2.45.0",
-    "express": "4.x"
+    "express": "4.x",
+    "ejs": "^1.0.0"
   }
 }
