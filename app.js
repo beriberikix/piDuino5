@@ -6,7 +6,11 @@ var five = require('johnny-five'),
     localtunnel = require('localtunnel'),
     request = require('request'),
     networkInterfaces = require('os').networkInterfaces(),
-    LOCAL_IP = '127.0.0.1';
+    LOCAL_IP = '127.0.0.1',
+    express = require('express'),
+    app = express();
+
+app.engine('html', require('ejs').renderFile);
 
 // board setup
 board.on('ready', function() {
@@ -23,9 +27,13 @@ board.on('ready', function() {
   });
 });
 
-// app.get('/', function(req, res) {
-//   res.render('index.html', { local_ip: LOCAL_IP, port: PORT });
-// });
+app.get('/', function(req, res) {
+  res.render('index.html', { local_ip: LOCAL_IP, port: PORT });
+});
+
+var server = app.listen(3000, function() {
+    console.log('Listening on port %d', server.address().port);
+});
 
 // ws setup
 wss.on('connection', function(ws) {

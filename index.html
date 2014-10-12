@@ -30,69 +30,39 @@
   <button id="reverse" disabled="disabled">Reverse</button>
 </div>
 
-<script src="/socket.io/socket.io.js"></script>
-<script src="/js/virtualjoystick.js/virtualjoystick.js"></script>
+<script src="/bower_components/virtualjoystick.js/virtualjoystick.js"></script>
 <script>
-  var socket = io.connect('http://192.168.0.195:1337');
+  var host = window.location.host.replace(/:.*/, '');
+  var ws = new WebSocket('ws://' + host );
 
-  socket.on('connect', function() {
-    //document.querySelector('#label').innerHTML = 'ready';
-    var forwardBtn = document.querySelector('#forward');
-    var reverseBtn = document.querySelector('#reverse');
-
-    forwardBtn.addEventListener('click', forward);
-    reverseBtn.addEventListener('click', reverse);
-
-    forwardBtn.removeAttribute('disabled');
-    reverseBtn.removeAttribute('disabled');
-  });
-
-  function forward() {
-    socket.emit('forward', { data : 'nothing' } );
+  var forward = function() {
+    ws.send('forward');
   }
 
-  function reverse() {
-    socket.emit('reverse', { data : 'nothing' } );
-  }
-
-  // turn right
-  function gee() {
-    socket.emit('gee', { data : 'nothing' } );
-  }
-
-  // turn left
-  function haw() {
-    socket.emit('haw', { data : 'nothing' } );
-  }
-
-  function halt() {
-    socket.emit('halt', { data : 'nothing' } );
-  }
-
-  var joystick	= new VirtualJoystick({
+  var joystick  = new VirtualJoystick({
     container : document.getElementById('container'),
     mouseSupport : true
   });
 
   function step(timestamp) {
     if( joystick.up() ) {
-      forward();
+      ws.send('forward');
     }
 
     if( joystick.down() ) {
-      reverse();
+      ws.send('reverse');
     }
 
     if( joystick.right() ) {
-      gee();
+      ws.send('turnRight');
     } 
 
     if( joystick.left() ) {
-      haw();
+      ws.send('turnLeft');
     }
 
-    if( joystick.deltaX() === 0 & joystick.deltaY() === 0 ) {
-      halt();
+    if( joystick.deltaX() === 0 && joystick.deltaY() === 0 && ws.readyState === 1) {
+      ws.send('halt');
     }
 
     webkitRequestAnimationFrame(step);
@@ -102,4 +72,3 @@
 </script>
 </body>
 </html>
-
