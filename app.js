@@ -2,21 +2,29 @@ var five = require('johnny-five'),
     board = new five.Board(),
     PORT = 8080,
     WebSocketServer = require('ws').Server,
-    wss = new WebSocketServer({port: PORT}),
     localtunnel = require('localtunnel'),
     request = require('request'),
     networkInterfaces = require('os').networkInterfaces(),
     LOCAL_IP = '127.0.0.1',
     express = require('express'),
-    app = express();
+    app = express(),
+    motors;
 
+//configure Express
+app.use('/bower_components',  express.static(__dirname + '/bower_components'));
 app.engine('html', require('ejs').renderFile);
+var server = app.listen(PORT, function() {
+    console.log('Listening on port %d', server.address().port);
+});
+
+var wss = new WebSocketServer({server: server});
+
+app.get('/', function(req, res) {
+  res.render('index.html');
+});
 
 // board setup
 board.on('ready', function() {
-  var motors, speed;
-
-  speed = 100;
   motors = {
     left: new five.Motor([ 3, 12 ]),
     right: new five.Motor([ 11, 13 ])
@@ -25,14 +33,6 @@ board.on('ready', function() {
   board.repl.inject({
     motors: motors
   });
-});
-
-app.get('/', function(req, res) {
-  res.render('index.html', { local_ip: LOCAL_IP, port: PORT });
-});
-
-var server = app.listen(3000, function() {
-    console.log('Listening on port %d', server.address().port);
 });
 
 // ws setup
