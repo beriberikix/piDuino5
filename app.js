@@ -11,6 +11,7 @@ var five = require('johnny-five'),
     motors;
 
 //configure Express
+app.set('views', __dirname);
 app.use('/bower_components',  express.static(__dirname + '/bower_components'));
 app.engine('html', require('ejs').renderFile);
 var server = app.listen(PORT, function() {
@@ -47,7 +48,7 @@ wss.on('connection', function(ws) {
     } else if(data === 'turnLeft') {
       turnLeft(255);
     } else if(data === 'halt') {
-      halt(255);
+      stop(255);
     }
   });
 });
