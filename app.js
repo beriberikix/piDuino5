@@ -1,4 +1,4 @@
-var five = require("johnny-five"),
+var five = require('johnny-five'),
     board = new five.Board(),
     PORT = 8080,
     WebSocketServer = require('ws').Server,
@@ -32,13 +32,13 @@ wss.on('connection', function(ws) {
     if(data === 'forward') {
       forward(255);
     } else if(data === 'reverse') {
-        reverse(255);
+      reverse(255);
     } else if(data === 'turnRight') {
-        turnRight(255);
+      turnRight(255);
     } else if(data === 'turnLeft') {
-        turnLeft(255);
+      turnLeft(255);
     } else if(data === 'halt') {
-        halt(255);
+      halt(255);
     }
   });
 });
