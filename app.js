@@ -5,7 +5,8 @@ var five = require('johnny-five'),
     wss = new WebSocketServer({port: PORT}),
     localtunnel = require('localtunnel'),
     request = require('request'),
-    LOCAL_IP = require('os').networkInterfaces().wlan0[0].address;
+    networkInterfaces = require('os').networkInterfaces(),
+    LOCAL_IP = '127.0.0.1';
 
 // board setup
 board.on('ready', function() {
@@ -73,9 +74,18 @@ var turnLeft = function(speed) {
 localtunnel(PORT, function(err, tunnel) {
   var device = 'mark1';
 
+  // use en0 if on mac while developing
+  if(networkInterfaces.wlan0) {
+    LOCAL_IP = networkInterfaces.wlan0[0].address;
+  } else {
+    LOCAL_IP = networkInterfaces.en0[1].address;
+  }
+
   var dhd_url = 'http://dhd-basic.appspot.com/?device=' + device;
       dhd_url += '&local_ip=' + LOCAL_IP;
       dhd_url += '&localtunnel=' + tunnel.url;
   
+  console.log(dhd_url);
+
   request.post(dhd_url);
 });
