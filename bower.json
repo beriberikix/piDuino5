@@ -22,6 +22,7 @@
     "tests"
   ],
   "dependencies": {
-    "virtualjoystick.js": "*"
+    "virtualjoystick.js": "*",
+    "uri.js": "~1.14.1"
   }
 }
