@@ -5,8 +5,6 @@ var five = require('johnny-five'),
     localtunnel = require('localtunnel'),
     request = require('request'),
     networkInterfaces = require('os').networkInterfaces(),
-    express = require('express'),
-    app = express(),
     motors = {},
     led = {};
 
@@ -32,23 +30,19 @@ board.on('ready', function() {
   };
 
   led = new five.Led(13);
-
-  board.repl.inject({
-    motors: motors
-  });
 });
 
 // ws setup
 wss.on('connection', function(ws) {
   ws.on('message', function(data, flags) {
     if(data === 'forward') {
-      forward();
+      forward(255);
     } else if(data === 'reverse') {
-      reverse();
+      reverse(255);
     } else if(data === 'turnRight') {
-      turnRight();
+      turnRight(255);
     } else if(data === 'turnLeft') {
-      turnLeft();
+      turnLeft(255);
     } else if(data === 'stop') {
       stop();
     } else if(data === 'blink') {
@@ -57,6 +51,8 @@ wss.on('connection', function(ws) {
       noBlink();
     }
   });
+}).on('error', function(e) {
+  console.log("Got error: " + e.message);
 });
 
 // motor functions
@@ -109,6 +105,5 @@ localtunnel(PORT, function(err, tunnel) {
   webappURL += '/locate?local_ip=' + localIP;
   webappURL += '&public_url=' + tunnel.url;
   
-  // request.post(webappURL);
   request.post(webappURL);
 });
