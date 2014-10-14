@@ -51,8 +51,15 @@ wss.on('connection', function(ws) {
       noBlink();
     }
   });
-}).on('error', function(e) {
-  console.log("Got error: " + e.message);
+
+  ws.on('close', function() {
+    console.log('WebSocket connection closed');
+  });
+
+  ws.on('error', function(e) {
+    console.log('WebSocket error: %s', e.message);
+  });
+
 });
 
 // motor functions
