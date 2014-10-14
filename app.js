@@ -8,27 +8,40 @@ var five = require('johnny-five'),
     LOCAL_IP = '127.0.0.1',
     express = require('express'),
     app = express(),
-    motors;
+    motors = {};
 
 //configure Express
-app.set('views', __dirname);
-app.use('/bower_components',  express.static(__dirname + '/bower_components'));
-app.engine('html', require('ejs').renderFile);
-var server = app.listen(PORT, function() {
-    console.log('Listening on port %d', server.address().port);
-});
+// app.set('views', __dirname);
+// app.use('/bower_components',  express.static(__dirname + '/bower_components'));
+// app.engine('html', require('ejs').renderFile);
+// var server = app.listen(PORT, function() {
+//     console.log('Listening on port %d', server.address().port);
+// });
 
-var wss = new WebSocketServer({server: server});
+// var wss = new WebSocketServer({server: server});
+var wss = new WebSocketServer({port: PORT});
 
-app.get('/', function(req, res) {
-  res.render('index.html');
-});
+// app.get('/', function(req, res) {
+//   res.render('index.html');
+// });
 
 // board setup
 board.on('ready', function() {
   motors = {
-    left: new five.Motor([ 3, 12 ]),
-    right: new five.Motor([ 11, 13 ])
+    left: new five.Motor({
+      pins: {
+        pwm: 3,
+        dir: 12
+      },
+      invertPWM: true
+    }),
+    right: new five.Motor({
+      pins: {
+        pwm: 5,
+        dir: 8
+      },
+      invertPWM: true
+    })
   };
 
   board.repl.inject({
@@ -40,15 +53,15 @@ board.on('ready', function() {
 wss.on('connection', function(ws) {
   ws.on('message', function(data, flags) {
     if(data === 'forward') {
-      forward(255);
+      forward();
     } else if(data === 'reverse') {
-      reverse(255);
+      reverse();
     } else if(data === 'turnRight') {
-      turnRight(255);
+      turnRight();
     } else if(data === 'turnLeft') {
-      turnLeft(255);
-    } else if(data === 'halt') {
-      stop(255);
+      turnLeft();
+    } else if(data === 'stop') {
+      stop();
     }
   });
 });
@@ -60,23 +73,23 @@ var stop = function() {
 };
 
 var forward = function(speed) {
-  motors.left.fwd(speed);
-  motors.right.fwd(speed);
+  motors.left.forward(speed);
+  motors.right.forward(speed);
 };
 
 var reverse = function(speed) {
-  motors.left.rev(speed);
-  motors.right.rev(speed);
+  motors.left.reverse(speed);
+  motors.right.reverse(speed);
 };
 
 var turnRight = function(speed) {
-  motors.left.fwd(speed);
-  motors.right.rev(speed);
+  motors.left.forward(speed);
+  motors.right.reverse(speed);
 };
 
 var turnLeft = function(speed) {
-  motors.left.rev(speed);
-  motors.right.fwd(speed);
+  motors.left.reverse(speed);
+  motors.right.forward(speed);
 };
 
 // dial-home device/localtunnel setup

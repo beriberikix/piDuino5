@@ -31,13 +31,11 @@
 </div>
 
 <script src="/bower_components/virtualjoystick.js/virtualjoystick.js"></script>
+<script src="/bower_components/uri.js/src/URI.min.js"></script>
 <script>
-  var host = window.location.host.replace(/:.*/, '');
-  var ws = new WebSocket('ws://' + host );
-
-  var forward = function() {
-    ws.send('forward');
-  }
+  var href = window.location.href;
+  var params = URI(href).query(true);
+  var ws = new WebSocket('ws://' + params['local_ip'] );
 
   var joystick  = new VirtualJoystick({
     container : document.getElementById('container'),
