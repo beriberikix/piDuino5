@@ -8,7 +8,8 @@ var five = require('johnny-five'),
     LOCAL_IP = '127.0.0.1',
     express = require('express'),
     app = express(),
-    motors = {};
+    motors = {},
+    led = {};
 
 //configure Express
 // app.set('views', __dirname);
@@ -44,6 +45,8 @@ board.on('ready', function() {
     })
   };
 
+  led = new five.Led(13);
+
   board.repl.inject({
     motors: motors
   });
@@ -62,6 +65,10 @@ wss.on('connection', function(ws) {
       turnLeft();
     } else if(data === 'stop') {
       stop();
+    } else if(data === 'blink') {
+      blink();
+    } else if(data === 'noBlink') {
+      noBlink();
     }
   });
 });
@@ -90,6 +97,14 @@ var turnRight = function(speed) {
 var turnLeft = function(speed) {
   motors.left.reverse(speed);
   motors.right.forward(speed);
+};
+
+var blink = function() {
+  led.strobe(300);
+};
+
+var noBlink = function() {
+  led.stop();
 };
 
 // dial-home device/localtunnel setup
