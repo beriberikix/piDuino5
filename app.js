@@ -11,20 +11,7 @@ var five = require('johnny-five'),
     motors = {},
     led = {};
 
-//configure Express
-// app.set('views', __dirname);
-// app.use('/bower_components',  express.static(__dirname + '/bower_components'));
-// app.engine('html', require('ejs').renderFile);
-// var server = app.listen(PORT, function() {
-//     console.log('Listening on port %d', server.address().port);
-// });
-
-// var wss = new WebSocketServer({server: server});
 var wss = new WebSocketServer({port: PORT});
-
-// app.get('/', function(req, res) {
-//   res.render('index.html');
-// });
 
 // board setup
 board.on('ready', function() {
