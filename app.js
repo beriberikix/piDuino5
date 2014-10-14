@@ -5,7 +5,6 @@ var five = require('johnny-five'),
     localtunnel = require('localtunnel'),
     request = require('request'),
     networkInterfaces = require('os').networkInterfaces(),
-    LOCAL_IP = '127.0.0.1',
     express = require('express'),
     app = express(),
     motors = {},
@@ -94,22 +93,22 @@ var noBlink = function() {
   led.stop();
 };
 
-// dial-home device/localtunnel setup
+// create localtunnel and send to the webapp
 localtunnel(PORT, function(err, tunnel) {
-  var device = 'mark1';
+  var webappURL = 'http://localhost:3000',
+      localIP;
 
+  // local_ip is useful for debugging
   // use en0 if on mac while developing
   if(networkInterfaces.wlan0) {
-    LOCAL_IP = networkInterfaces.wlan0[0].address;
+    localIP = networkInterfaces.wlan0[0].address;
   } else {
-    LOCAL_IP = networkInterfaces.en0[1].address;
+    localIP = networkInterfaces.en0[1].address;
   }
 
-  var dhd_url = 'http://dhd-basic.appspot.com/?device=' + device;
-      dhd_url += '&local_ip=' + LOCAL_IP;
-      dhd_url += '&localtunnel=' + tunnel.url;
+  webappURL += '/locate?local_ip=' + localIP;
+  webappURL += '&public_url=' + tunnel.url;
   
-  console.log(dhd_url);
-
-  request.post(dhd_url);
+  // request.post(webappURL);
+  request.post(webappURL);
 });
