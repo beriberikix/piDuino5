@@ -101,6 +101,8 @@ localtunnel(PORT, function(err, tunnel) {
   var webappURL = 'http://localhost:3000',
       localIP;
 
+  console.log('localtunnel address is %s', tunnel.url);
+
   // local_ip is useful for debugging
   // use en0 if on mac while developing
   if(networkInterfaces.wlan0) {
@@ -112,5 +114,9 @@ localtunnel(PORT, function(err, tunnel) {
   webappURL += '/locate?local_ip=' + localIP;
   webappURL += '&public_url=' + tunnel.url;
   
-  request.post(webappURL);
+  request.post(webappURL, function(e, r, body) {
+    if (err) {
+      return console.error('POST request failed:', err);
+    }
+  });
 });
