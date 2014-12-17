@@ -2,7 +2,7 @@ var five = require('johnny-five'),
     board = new five.Board(),
     PORT = 8080,
     WebSocketServer = require('ws').Server,
-    localtunnel = require('localtunnel'),
+//    localtunnel = require('localtunnel'),
     request = require('request'),
     networkInterfaces = require('os').networkInterfaces(),
     motors = {},
@@ -97,11 +97,11 @@ var noBlink = function() {
 };
 
 // create localtunnel and send to the webapp
-localtunnel(PORT, function(err, tunnel) {
+//localtunnel(PORT, function(err, tunnel) {
   var webappURL = 'http://localhost:3000',
       localIP;
 
-  console.log('localtunnel address is %s', tunnel.url);
+//  console.log('localtunnel address is %s', tunnel.url);
 
   // local_ip is useful for debugging
   // use en0 if on mac while developing
@@ -111,12 +111,14 @@ localtunnel(PORT, function(err, tunnel) {
     localIP = networkInterfaces.en0[1].address;
   }
 
+  console.log('local ip is ws://%s:%s', localIP, PORT);
+
   webappURL += '/locate?local_ip=' + localIP;
-  webappURL += '&public_url=' + tunnel.url;
+  // webappURL += '&public_url=' + tunnel.url;
   
   request.post(webappURL, function(e, r, body) {
-    if (err) {
-      return console.error('POST request failed:', err);
+    if (e) {
+      return console.error('POST request failed:', e);
     }
   });
-});
+// });
